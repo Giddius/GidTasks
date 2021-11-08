@@ -13,10 +13,9 @@ requires-python = ">=3.9"
 dependencies = ["invoke==1.6.0"]
 
 [project.urls]
-Source = "https://github.com/Giddius/Antistasi_Logbook"
+Source = "https://github.com/Giddius/GidTasks"
 
 [project.scripts]
-antistasi-logbook = "antistasi_logbook.__main__:cli"
 
 [project.optional-dependencies]
 
