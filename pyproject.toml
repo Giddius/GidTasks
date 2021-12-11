@@ -10,7 +10,12 @@ license = { file = "LICENSE" }
 readme = "README.md"
 dynamic = ['version', 'description']
 requires-python = ">=3.9"
-dependencies = ["invoke==1.6.0"]
+dependencies = [
+    "invoke==1.6.0",
+    "attrs==21.2.0",
+    "rich==10.12.0",
+    "watchdog~=0.9.0"
+]
 
 [project.urls]
 Source = "https://github.com/Giddius/GidTasks"
@@ -34,9 +39,17 @@ exclude = [
     "tasks.py",
 ]
 
+[tool.autoflake]
+# additional_imports=None
+expand_star_imports = true
+remove_all_unused_imports = true
+remove_duplicate_keys = false
+remove_unused_variables = false
+ignore_init_module_imports = false
+
 [tool.autopep8]
 ignore = ["E402", "E501"]
-max-line-length = 250
+max_line_length = 250
 
 [tool.isort]
 balanced_wrapping = true
@@ -47,7 +60,13 @@ import_heading_gid = "* Gid Imports --------------------------------------------
 import_heading_pyqt = "* PyQt5 Imports --------------------------------------------------------------------------------------->"
 import_heading_stdlib = "* Standard Library Imports ---------------------------------------------------------------------------->"
 import_heading_thirdparty = "* Third Party Imports --------------------------------------------------------------------------------->"
-known_gid = ["gidtools", "gidlogger", "gidqtutils", "gidviewmodels"]
+known_gid = [
+    "gidtools",
+    "gidlogger",
+    "gidqtutils",
+    "gidviewmodels",
+    "gidapptools"
+]
 known_pyqt = ["PyQt5"]
 length_sort = true
 line_length = 200
@@ -63,4 +82,4 @@ sections = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "-rP -vv --durations=0 --show-capture=all --color=auto --code-highlight=yes"
+addopts = "-rA -vv --durations=0 --capture=tee-sys --show-capture=all --color=auto --code-highlight=yes --html=tests/reports/report.html --self-contained-html --alluredir=tests/reports/my_allure_results"
