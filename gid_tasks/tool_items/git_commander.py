@@ -131,5 +131,6 @@ if __name__ == '__main__':
     x = GitCommander(Path(r"D:\Dropbox\hobby\Modding\Programs\Github\My_Repos\GidTasks").resolve())
     x.run_command(AddCommand())
     x.run_command(CommitCommand("something2"))
+    x.run_command(PushCommand(True))
 
 # endregion[Main_Exec]
