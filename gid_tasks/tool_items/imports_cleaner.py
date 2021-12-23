@@ -6,59 +6,26 @@ Soon.
 
 # region [Imports]
 
-import os
+# * Standard Library Imports ---------------------------------------------------------------------------->
 import re
-import sys
-import json
-import queue
-import math
-import base64
-import pickle
-import random
-import shelve
-import dataclasses
-import shutil
-import asyncio
-import logging
-import sqlite3
-import platform
-import importlib
-import subprocess
-import inspect
-
-from time import sleep, process_time, process_time_ns, perf_counter, perf_counter_ns
-from io import BytesIO, StringIO
-from abc import ABC, ABCMeta, abstractmethod
-from copy import copy, deepcopy
-from enum import Enum, Flag, auto, unique
-from time import time, sleep
-from pprint import pprint, pformat
+from typing import TYPE_CHECKING, Any, Mapping, Optional
 from pathlib import Path
-from string import Formatter, digits, printable, whitespace, punctuation, ascii_letters, ascii_lowercase, ascii_uppercase
-from timeit import Timer
-from typing import TYPE_CHECKING, Union, Callable, Iterable, Optional, Mapping, Any, IO, TextIO, BinaryIO, Hashable, Generator, Literal, TypeVar, TypedDict, AnyStr
-from zipfile import ZipFile, ZIP_LZMA
-from datetime import datetime, timezone, timedelta
-from tempfile import TemporaryDirectory
-from textwrap import TextWrapper, fill, wrap, dedent, indent, shorten
-from functools import wraps, partial, lru_cache, singledispatch, total_ordering, cached_property
-from importlib import import_module, invalidate_caches
-from contextlib import contextmanager, asynccontextmanager, nullcontext, closing, ExitStack, suppress
-from statistics import mean, mode, stdev, median, variance, pvariance, harmonic_mean, median_grouped
-from collections import Counter, ChainMap, deque, namedtuple, defaultdict
-from urllib.parse import urlparse
-from importlib.util import find_spec, module_from_spec, spec_from_file_location
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
-from importlib.machinery import SourceFileLoader
-from gid_tasks.errors import IsFolderError, WrongFileTypeError
+
+# * Third Party Imports --------------------------------------------------------------------------------->
 import attr
 import isort
 import autopep8
 import autoflake
+
+# * Gid Imports ----------------------------------------------------------------------------------------->
 from gidapptools import get_logger
+from gid_tasks.project_info.project import Project
+from gidapptools.general_helper.hashing import file_hash
+
+# * Type-Checking Imports --------------------------------------------------------------------------------->
 if TYPE_CHECKING:
     from gid_tasks.project_info.toml import PyProjectTomlFile
-    from gid_tasks.project_info.project import Project
+
 # endregion[Imports]
 
 # region [TODO]
@@ -87,16 +54,22 @@ log = get_logger(__name__)
 # ignore_init_module_imports = true
 
 
+def _clean_import_content(raw_content: str):
+    cleaned_lines = (line for line in raw_content.splitlines() if line.strip() != "" and not line.strip().startswith('#'))
+    return '\n'.join(cleaned_lines).strip()
+
+
 @attr.s(auto_detect=True, auto_attribs=True, slots=True)
 class ImportSectionParts:
     start_line: str = attr.ib(converter=lambda x: x.strip())
     end_line: str = attr.ib(converter=lambda x: x.strip())
-    content: str = attr.ib(converter=lambda x: x.strip())
+    content: str = attr.ib(converter=_clean_import_content)
     start_pos: int = attr.ib()
     end_pos: int = attr.ib()
 
 
 class _ImportsCleanerTargetFile:
+    type_checking_import_header_comment: str = "# * Type-Checking Imports --------------------------------------------------------------------------------->"
 
     def __init__(self, path: Path, imports_region_regex: re.Pattern) -> None:
         self.path = path
@@ -126,7 +99,9 @@ class _ImportsCleanerTargetFile:
 
     def _new_content(self) -> str:
         if self.has_no_imports_region is False:
-            return self.imports_region_regex.sub(rf"\g<start_line>\n{self.import_section_parts.content}\g<end_line>", self.content)
+            new_content = self.imports_region_regex.sub(rf"\g<start_line>\n{self.import_section_parts.content}\g<end_line>", self.content)
+            new_content = new_content.replace("if TYPE_CHECKING:", self.type_checking_import_header_comment + '\nif TYPE_CHECKING:', 1)
+            return new_content
         return self.content
 
     def write(self) -> None:
@@ -231,6 +206,7 @@ class ImportsCleaner:
             return
         if all(i is False for i in (self.use_autoflake, self.use_autopep8, self.use_isort)):
             return
+        old_hash = file_hash(file)
         wrapped_file = _ImportsCleanerTargetFile(path=file, imports_region_regex=self.import_region_regex)
         if self.use_autoflake is True:
             wrapped_file = self._apply_autoflake(wrapped_file=wrapped_file)
@@ -239,6 +215,8 @@ class ImportsCleaner:
         if self.use_autopep8 is True:
             wrapped_file = self._apply_autopep8(wrapped_file=wrapped_file)
         wrapped_file.write()
+        if old_hash == file_hash(file):
+            return
         return file
 
     def __call__(self, file: Path) -> Optional[Path]:
@@ -249,13 +227,12 @@ def import_clean_project(project: "Project"):
     import_cleaner = ImportsCleaner.from_pyproject_toml(project.pyproject)
     for file in project.main_module.get_all_python_files(exclude_init=import_cleaner.exclude_init_files, extra_excludes=import_cleaner.exclude_globs):
         _file = import_cleaner.clean_file(file=file)
-        log.info("cleaned imports of file %r", _file.as_posix())
+        if _file is not None:
+            log.info("cleaned imports of file %r", _file.as_posix())
 # region[Main_Exec]
 
 
 if __name__ == '__main__':
-    from gid_tasks.project_info.project import Project
-    x = Project()
-    y = ImportsCleaner.from_pyproject_toml(x.pyproject)
-    y(Path(r"D:\Dropbox\hobby\Modding\Programs\Github\My_Repos\GidTasks\gid_tasks\project_info\toml.py"))
+    p = Project(base_folder=Path(r"D:\Dropbox\hobby\Modding\Programs\Github\My_Repos\GidTasks"))
+    import_clean_project(p)
 # endregion[Main_Exec]

@@ -8,7 +8,7 @@ Soon.
 
 # * Standard Library Imports ---------------------------------------------------------------------------->
 import os
-from typing import TYPE_CHECKING, Any, Union, Mapping, Iterable, Optional, Generator
+from typing import Any, Union, Mapping, Iterable, Optional, Generator
 from pathlib import Path
 from functools import cached_property
 from threading import Lock
@@ -17,13 +17,12 @@ from threading import Lock
 from yarl import URL
 from tomlkit.api import loads as toml_loads
 from watchdog.events import FileModifiedEvent
-from gid_tasks.errors import NotUniqueNestedKey, WrongFileTypeError
 from tomlkit.toml_document import TOMLDocument
 
 # * Gid Imports ----------------------------------------------------------------------------------------->
+from gid_tasks.errors import NotUniqueNestedKey, WrongFileTypeError
 from gidapptools.general_helper.enums import MiscEnum
 from gidapptools.general_helper.hashing import file_hash
-
 
 # endregion[Imports]
 
@@ -229,24 +228,34 @@ class PyProjectTomlFile(GidTomlFile):
     @cached_property
     def authors(self) -> Optional[frozenset[str]]:
         raw_authors = self.get_from_key_path(["project", "authors"], default=None)
-        if raw_authors is None:
-            return raw_authors
-        return frozenset(str(author.get("name")) for author in raw_authors)
+        if raw_authors is not None:
+            return frozenset(str(author.get("name")) for author in raw_authors)
 
     def get_autoflake_settings(self, default=MiscEnum.NOTHING) -> dict[str, Any]:
+        default = {} if default is MiscEnum.NOTHING else default
         return self.get_from_key_path(["tool", "autoflake"], default=default)
 
     def get_autopep8_settings(self, default=MiscEnum.NOTHING) -> dict[str, Any]:
+        default = {} if default is MiscEnum.NOTHING else default
         return self.get_from_key_path(["tool", "autopep8"], default=default)
 
+    def _complete_isort_settings(self, settings: dict[str, Any]) -> dict[str, Any]:
+        settings["known_first_party"] = list(set(settings.get("known_first_party", []) + [self.package_name]))
+        settings["known_qt"] = list(set(settings.get("known_qt", []) + ["PyQt5", "PyQt6", "PySide6", "pyqtgraph"]))
+        settings["known_gid"] = list(set(settings.get("known_gid", []) + ["gid*"]))
+        return settings
+
     def get_isort_settings(self, default=MiscEnum.NOTHING) -> dict[str, Any]:
-        return self.get_from_key_path(["tool", "isort"], default=default)
+        default = {} if default is MiscEnum.NOTHING else default
+        settings = self.get_from_key_path(["tool", "isort"], default=default)
+        return self._complete_isort_settings(settings=settings)
 
     def get_gid_task_settings(self, default=MiscEnum.NOTHING) -> dict[str, Any]:
+        default = {} if default is MiscEnum.NOTHING else default
         return self.get_from_key_path(["tool", "gid_tasks"], default=default)
 
     def get_project_data(self) -> dict[str, Any]:
-        return self.get("project")
+        return self.get("project", default={})
 
 # region[Main_Exec]
 
