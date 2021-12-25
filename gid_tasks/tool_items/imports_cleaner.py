@@ -6,9 +6,11 @@ Soon.
 
 # region [Imports]
 
+# * Typing Imports --------------------------------------------------------------------------------------->
+from typing import TYPE_CHECKING, Any, Mapping, Optional
+
 # * Standard Library Imports ---------------------------------------------------------------------------->
 import re
-from typing import TYPE_CHECKING, Any, Mapping, Optional
 from pathlib import Path
 
 # * Third Party Imports --------------------------------------------------------------------------------->

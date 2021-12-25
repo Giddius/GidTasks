@@ -6,10 +6,12 @@ Soon.
 
 # region [Imports]
 
+# * Typing Imports --------------------------------------------------------------------------------------->
+from typing import TYPE_CHECKING
+
 # * Standard Library Imports ---------------------------------------------------------------------------->
 import os
 import re
-from typing import TYPE_CHECKING
 from pathlib import Path
 
 # * Gid Imports ----------------------------------------------------------------------------------------->

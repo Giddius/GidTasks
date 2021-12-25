@@ -6,9 +6,11 @@ Soon.
 
 # region [Imports]
 
+# * Typing Imports --------------------------------------------------------------------------------------->
+from typing import Any, Union
+
 # * Standard Library Imports ---------------------------------------------------------------------------->
 import os
-from typing import Any, Union
 from pathlib import Path
 
 # * Third Party Imports --------------------------------------------------------------------------------->

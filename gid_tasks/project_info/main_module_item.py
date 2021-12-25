@@ -6,9 +6,11 @@ Soon.
 
 # region [Imports]
 
+# * Typing Imports --------------------------------------------------------------------------------------->
+from typing import TYPE_CHECKING, Iterable, Optional, Generator
+
 # * Standard Library Imports ---------------------------------------------------------------------------->
 import os
-from typing import TYPE_CHECKING, Iterable, Optional, Generator
 from pathlib import Path
 from functools import cached_property
 

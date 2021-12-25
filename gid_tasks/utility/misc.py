@@ -6,10 +6,12 @@ Soon.
 
 # region [Imports]
 
+# * Typing Imports --------------------------------------------------------------------------------------->
+from typing import Optional
+
 # * Standard Library Imports ---------------------------------------------------------------------------->
 import shutil
 import subprocess
-from typing import Optional
 from pathlib import Path
 
 # endregion[Imports]

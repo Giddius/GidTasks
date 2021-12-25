@@ -11,6 +11,9 @@ readme = "README.md"
 dynamic = ['version', 'description']
 requires-python = ">=3.9"
 dependencies = [
+    "isort",
+    "autoflake==1.4",
+    "autopep8",
     "invoke==1.6.0",
     "attrs==21.2.0",
     "rich==10.12.0",
@@ -55,6 +58,7 @@ max_line_length = 250
 balanced_wrapping = true
 ensure_newline_before_comments = true
 group_by_package = true
+import_heading_typing = "* Typing Imports --------------------------------------------------------------------------------------->"
 import_heading_firstparty = "* Local Imports --------------------------------------------------------------------------------------->"
 import_heading_gid = "* Gid Imports ----------------------------------------------------------------------------------------->"
 import_heading_qt = "* Qt Imports --------------------------------------------------------------------------------------->"
@@ -68,11 +72,13 @@ known_gid = [
     "gidapptools"
 ]
 known_qt = ["PyQt5", "PyQt6", "PySide6", "pyqtgraph"]
+known_typing = ["typing"]
 length_sort = true
 line_length = 200
 lines_after_imports = 1
 sections = [
     "FUTURE",
+    "TYPING",
     "STDLIB",
     "THIRDPARTY",
     "QT",
@@ -81,6 +87,7 @@ sections = [
     "LOCALFOLDER",
 ]
 indented_import_headings = false
+force_to_top = ["typing"]
 
 [tool.pytest.ini_options]
 addopts = "-rA -vv --durations=0 --capture=tee-sys --show-capture=all --color=auto --code-highlight=yes"

@@ -6,9 +6,11 @@ Soon.
 
 # region [Imports]
 
+# * Typing Imports --------------------------------------------------------------------------------------->
+from typing import TYPE_CHECKING, Union, Callable, Optional
+
 # * Standard Library Imports ---------------------------------------------------------------------------->
 import json
-from typing import TYPE_CHECKING, Union, Callable, Optional
 from pathlib import Path
 
 # * Gid Imports ----------------------------------------------------------------------------------------->
