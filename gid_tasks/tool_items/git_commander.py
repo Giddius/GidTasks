@@ -10,7 +10,7 @@ Soon.
 import subprocess
 from abc import ABC, abstractmethod
 from pathlib import Path
-
+from typing import Any
 # endregion[Imports]
 
 # region [TODO]
@@ -33,20 +33,39 @@ THIS_FILE_DIR = Path(__file__).parent.absolute()
 class AbstractCommand(ABC):
     shell: bool = False
     check: bool = False
+    text: bool = True
+    start_new_session: bool = False
+    creationflags = None
+
+    asynchronous: bool = False
+    disown: bool = False
+    dry: bool = False
+    echo: bool = False
+    hide: bool = False
+    in_stream = None
+    out_stream = None
+    inv_shell: str = None
+
+    timeout: int = None
 
     @property
     @abstractmethod
-    def args(self):
+    def arg_string(self) -> str:
         ...
 
     def handle_error(self, result: subprocess.CompletedProcess):
         result.check_returncode()
 
+    @property
+    def subprocess_kwargs(self) -> dict[str, Any]:
+        _out = {"shell": self.shell, "check": self.check, "text": self.text, "start_new_session": self.start_new_session, "timeout": self.timeout, "creationflags": self.creationflags}
+        return {k: v for k, v in _out.items() if v is not None}
+
 
 class AddCommand(AbstractCommand):
 
     @property
-    def args(self):
+    def arg_string(self):
         return "git add ."
 
 
@@ -56,7 +75,7 @@ class CommitCommand(AbstractCommand):
         self.message = message
 
     @property
-    def args(self):
+    def arg_string(self):
         return f'git commit -am "{self.message}"'
 
 
@@ -66,7 +85,7 @@ class PushCommand(AbstractCommand):
         self.dry_run = dry_run
 
     @property
-    def args(self):
+    def arg_string(self):
         args = "git push"
         if self.dry_run is True:
             args += ' --dry-run'
@@ -79,7 +98,7 @@ class GitCommander:
         self.cwd = cwd
 
     def run_command(self, command: AbstractCommand):
-        result = subprocess.run(args=command.args, shell=command.shell, check=command.check, cwd=self.cwd, text=True)
+        result = subprocess.run(args=command.arg_string, cwd=self.cwd, **command.subprocess_kwargs)
         if result.returncode != 0:
             command.handle_error(result)
 
