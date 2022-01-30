@@ -6,7 +6,6 @@ https://github.com/pyinstaller/pyinstaller/tarball/develop
 invoke
 ipython
 isort
-jupyter
 line_profiler
 matplotlib
 memory-profiler
@@ -20,3 +19,4 @@ pydeps
 pylint
 pympler
 tomlkit
+pipdeptree

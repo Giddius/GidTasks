@@ -58,7 +58,7 @@ def convert_maybe_path(in_data: Union[str, os.PathLike, Path, None]) -> Union[Pa
     return Path(in_data).resolve()
 
 
-@attr.s(slots=True, auto_attribs=True, auto_detect=True, kw_only=True)
+@attr.s(slots=False, auto_attribs=True, auto_detect=True, kw_only=True, frozen=True)
 class Version:
     major: int = attr.ib(converter=int)
     minor: int = attr.ib(converter=int)
@@ -68,30 +68,31 @@ class Version:
     line_number: int = attr.ib(default=None, converter=convert_maybe_int)
 
     def increment_major(self) -> "Version":
-        self.major += 1
-        self.minor = 0
-        self.patch = 0
-        self.extra = None
-        self.write_version()
-        return self
+        major = self.major + 1
+        minor = 0
+        patch = 0
+        extra = None
+        kwargs = vars(self) | {"major": major, "minor": minor, "patch": patch, "extra": extra}
+        return self.__class__(**kwargs)
 
     def increment_minor(self) -> "Version":
-        self.minor += 1
-        self.patch = 0
-        self.extra = None
-        self.write_version()
-        return self
+        minor = self.minor + 1
+        patch = 0
+        extra = None
+
+        kwargs = vars(self) | {"minor": minor, "patch": patch, "extra": extra}
+        return self.__class__(**kwargs)
 
     def increment_patch(self) -> "Version":
-        self.patch += 1
-        self.extra = None
-        self.write_version()
-        return self
+        patch = self.patch + 1
+        extra = None
+        kwargs = vars(self) | {"patch": patch, "extra": extra}
+        return self.__class__(**kwargs)
 
     def set_extra(self, extra_value: Any) -> "Version":
-        self.extra = extra_value
-        self.write_version()
-        return self
+        extra = extra_value
+        kwargs = vars(self) | {"extra": extra}
+        return self.__class__(**kwargs)
 
     def write_version(self) -> "Version":
         return NotImplemented

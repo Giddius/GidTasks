@@ -12,7 +12,7 @@ from gid_tasks.utility.misc import main_dir_from_git, find_main_dir_by_pyproject
 
 @pytest.fixture()
 def fake_project(fake_package: Path) -> Project:
-    yield Project(cwd=fake_package, base_folder=fake_package)
+    yield Project(cwd=fake_package)
 
 
 @pytest.fixture()

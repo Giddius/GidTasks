@@ -7,8 +7,8 @@ Soon.
 # region [Imports]
 
 # * Typing Imports --------------------------------------------------------------------------------------->
-from typing import TYPE_CHECKING, Any, Mapping, Optional
-
+from typing import TYPE_CHECKING, Any, Mapping, Optional, Iterable
+from invoke import task
 # * Standard Library Imports ---------------------------------------------------------------------------->
 import re
 from pathlib import Path
@@ -230,11 +230,17 @@ def import_clean_project(project: "Project"):
     for file in project.main_module.get_all_python_files(exclude_init=import_cleaner.exclude_init_files, extra_excludes=import_cleaner.exclude_globs):
         _file = import_cleaner.clean_file(file=file)
         if _file is not None:
-            log.info("cleaned imports of file %r", _file.as_posix())
+            yield _file
+
+
+@task(name="clean_imports")
+def clean_imports_task(c):
+    for cleaned_file in import_clean_project(c.project):
+        c.console.print(f"cleaned file -> {cleaned_file.as_posix()!r}")
 # region[Main_Exec]
 
 
 if __name__ == '__main__':
-    p = Project(base_folder=Path(r"D:\Dropbox\hobby\Modding\Programs\Github\My_Repos\GidTasks"))
-    import_clean_project(p)
+    p = Project(base_folder=Path(r"D:\Dropbox\hobby\Modding\Programs\Github\My_Repos\Antistasi_Logbook"))
+    import_clean_project(p, exclude={"sqf_syntax_data.py", "antistasi_logbook_resources.py"})
 # endregion[Main_Exec]

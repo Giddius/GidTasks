@@ -1,0 +1,39 @@
+# Todo's
+
+## General Todo's
+
+{% for identifier, todo_list in todo_data.general_todo_by_identifier.items() %}
+
+### {{identifier.title()}}
+
+{% for todo_item in todo_list %}
+- [ ] **{{todo_item.category.title()}}**
+
+
+
+> {{todo_item.text}}
+
+---
+
+{% endfor %}
+{% endfor %}
+
+
+## Code Todo's
+
+{% for identifier, todo_list in todo_data.found_todo_by_identifier.items() %}
+
+### **{{identifier.title()}}**
+
+{% for todo_item in todo_list %}
+- **[{{todo_item.file_path.as_posix().replace("_","\_")}}]({{todo_item.file_path.as_posix()}}#L{{todo_item.line_number}})**
+    *Line-num: {{todo_item.line_number}}*
+
+
+
+> {{todo_item.text}}
+
+---
+
+{% endfor %}
+{% endfor %}

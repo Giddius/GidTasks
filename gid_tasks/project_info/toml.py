@@ -259,6 +259,7 @@ class PyProjectTomlFile(GidTomlFile):
     def get_project_data(self) -> dict[str, Any]:
         return self.get("project", default={})
 
+
 # region[Main_Exec]
 
 

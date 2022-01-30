@@ -11,6 +11,8 @@ import subprocess
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any
+import os
+from pprint import pprint
 # endregion[Imports]
 
 # region [TODO]
@@ -36,6 +38,7 @@ class AbstractCommand(ABC):
     text: bool = True
     start_new_session: bool = False
     creationflags = None
+    capture_output: bool = True
 
     asynchronous: bool = False
     disown: bool = False
@@ -50,7 +53,7 @@ class AbstractCommand(ABC):
 
     @property
     @abstractmethod
-    def arg_string(self) -> str:
+    def args(self) -> str:
         ...
 
     def handle_error(self, result: subprocess.CompletedProcess):
@@ -58,14 +61,33 @@ class AbstractCommand(ABC):
 
     @property
     def subprocess_kwargs(self) -> dict[str, Any]:
-        _out = {"shell": self.shell, "check": self.check, "text": self.text, "start_new_session": self.start_new_session, "timeout": self.timeout, "creationflags": self.creationflags}
+        _out = {"shell": self.shell,
+                "check": self.check,
+                "text": self.text,
+                "start_new_session": self.start_new_session,
+                "timeout": self.timeout,
+                "creationflags": self.creationflags,
+                "capture_output": self.capture_output}
+        return {k: v for k, v in _out.items() if v is not None}
+
+    @property
+    def invoke_kwargs(self) -> dict[str, Any]:
+        _out = {'asynchronous': self.asynchronous,
+                'disown': self.disown,
+                'dry': self.dry,
+                'echo': self.echo,
+                'hide': self.hide,
+                'in_stream': self.in_stream,
+                'inv_shell': self.shell,
+                'out_stream': self.out_stream,
+                'timeout': self.timeout}
         return {k: v for k, v in _out.items() if v is not None}
 
 
 class AddCommand(AbstractCommand):
 
     @property
-    def arg_string(self):
+    def args(self):
         return "git add ."
 
 
@@ -75,7 +97,7 @@ class CommitCommand(AbstractCommand):
         self.message = message
 
     @property
-    def arg_string(self):
+    def args(self):
         return f'git commit -am "{self.message}"'
 
 
@@ -85,7 +107,7 @@ class PushCommand(AbstractCommand):
         self.dry_run = dry_run
 
     @property
-    def arg_string(self):
+    def args(self):
         args = "git push"
         if self.dry_run is True:
             args += ' --dry-run'
@@ -97,18 +119,9 @@ class GitCommander:
     def __init__(self, cwd: Path) -> None:
         self.cwd = cwd
 
-    def run_command(self, command: AbstractCommand):
-        result = subprocess.run(args=command.arg_string, cwd=self.cwd, **command.subprocess_kwargs)
-        if result.returncode != 0:
-            command.handle_error(result)
 
 # region[Main_Exec]
 
-
 if __name__ == '__main__':
-    x = GitCommander(Path(r"D:\Dropbox\hobby\Modding\Programs\Github\My_Repos\GidTasks").resolve())
-    x.run_command(AddCommand())
-    x.run_command(CommitCommand("something2"))
-    x.run_command(PushCommand())
-
+    pass
 # endregion[Main_Exec]
