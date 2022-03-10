@@ -1,5 +1,5 @@
 from gid_tasks.project_info.project import Project
-from gid_tasks.hackler.doc_hackler import todo_task
+from gid_tasks.hackler.doc_handling import todo_task
 from gid_tasks.hackler.imports_cleaner import clean_imports_task
 from rich.console import Console as RichConsole
 from invoke import Collection, task, Context, context
