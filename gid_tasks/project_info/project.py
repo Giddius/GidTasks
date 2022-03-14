@@ -143,8 +143,8 @@ class Project:
         self.pip_manager = self._determine_pip_manager() if pip_manager is None else pip_manager
 
         self.version = VersionFinder(self.pip_manager, self.main_module).find_version()
-
-        self.paths = project_paths_class(self.base_folder)
+        self._project_paths_class = project_paths_class
+        self.paths = self._project_paths_class(self.base_folder)
 
     @cached_property
     def general_project_data(self) -> dict[str, Any]:
@@ -222,6 +222,9 @@ class Project:
         self.version = new_version
         self.version.write_version()
         return self
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}(pip_manager={self.pip_manager!r}, cwd={self.cwd!r}, project_paths_class={self._project_paths_class!r})'
 
         # region[Main_Exec]
 

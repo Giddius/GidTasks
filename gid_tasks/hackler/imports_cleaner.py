@@ -228,6 +228,7 @@ class ImportsCleaner:
 def import_clean_project(project: "Project"):
     import_cleaner = ImportsCleaner.from_pyproject_toml(project.pyproject)
     for file in project.main_module.get_all_python_files(exclude_init=import_cleaner.exclude_init_files, extra_excludes=import_cleaner.exclude_globs):
+        print(file)
         _file = import_cleaner.clean_file(file=file)
         if _file is not None:
             yield _file
@@ -241,6 +242,6 @@ def clean_imports_task(c):
 
 
 if __name__ == '__main__':
-    p = Project(base_folder=Path(r"D:\Dropbox\hobby\Modding\Programs\Github\My_Repos\Antistasi_Logbook"))
-    import_clean_project(p, exclude={"sqf_syntax_data.py", "antistasi_logbook_resources.py"})
+    p = Project(cwd=Path(r"D:\Dropbox\hobby\Modding\Programs\Github\My_Repos\Antistasi_Logbook\antistasi_logbook"))
+    list(import_clean_project(p))
 # endregion[Main_Exec]
