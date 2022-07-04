@@ -55,7 +55,8 @@ from importlib.machinery import SourceFileLoader
 
 import attr
 
-from gidapptools.utility_classes import VersionItem
+from gid_tasks.project_info.project import Project
+from gidapptools.gid_utility.version_item import VersionItem
 from yarl import URL
 
 # endregion[Imports]
@@ -133,6 +134,10 @@ class FoundDependencies(UserList):
 
     def serialize(self) -> list[dict[str, Any]]:
         return [item.serialize() for item in self]
+
+    def to_file(self, file_path: os.PathLike) -> None:
+        with Path(file_path).resolve().open("w", encoding='utf-8', errors='ignore') as f:
+            json.dump(self.serialize(), f, default=str, sort_keys=False, indent=4)
 
 
 class AstImportVisitor(ast.NodeVisitor):
@@ -214,6 +219,14 @@ class DependencyFinder:
                 self.found_dependencies.add(dependency)
         for errored in visitor.errored:
             self.errored_names.add(errored)
+        pp(self.errored_names)
+
+
+def find_project_dependencies(project: Project, output_file_path: os.PathLike):
+    finder = DependencyFinder(main_package_name=project.main_module_name)
+    for file in project.main_module.get_all_python_files():
+        finder.search_file(file)
+    finder.found_dependencies.to_file(output_file_path)
 
 
 # region[Main_Exec]

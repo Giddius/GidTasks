@@ -3,5 +3,4 @@ pipreqs
 pydeps
 tzlocal
 orjson
-psutil
 urlextract

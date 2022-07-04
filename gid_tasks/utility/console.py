@@ -84,7 +84,7 @@ from rich.padding import Padding
 from rich.pager import Pager, SystemPager
 from rich.palette import Palette
 from rich.panel import Panel
-from rich.pretty import Node, Pretty, install, is_expandable, pprint, pretty_repr, traverse
+from rich.pretty import Node, Pretty, install as rich_pretty_install, is_expandable, pprint, pretty_repr, traverse
 from rich.progress import (BarColumn, DownloadColumn, FileSizeColumn, Progress, ProgressColumn, ProgressSample, ProgressType, RenderableColumn, SpinnerColumn, Task, TaskID, TextColumn,
                            TimeElapsedColumn, TimeRemainingColumn, TotalFileSizeColumn, TransferSpeedColumn, track)
 from rich.progress_bar import ProgressBar
@@ -102,11 +102,11 @@ from rich.style import NULL_STYLE, Style, StyleStack
 from rich.styled import Styled
 from rich.syntax import ANSISyntaxTheme, PygmentsSyntaxTheme, Syntax, SyntaxTheme
 from rich.table import Column, Row, Table
-from rich.tabulate import tabulate_mapping
+
 from rich.terminal_theme import DEFAULT_TERMINAL_THEME, TerminalTheme
 from rich.text import Span, Text
 from rich.theme import Theme, ThemeStack, ThemeStackError
-from rich.traceback import Frame, PathHighlighter, Stack, Trace, Traceback, install
+from rich.traceback import Frame, PathHighlighter, Stack, Trace, Traceback, install as rich_traceback_install
 from rich.tree import Tree
 
 if TYPE_CHECKING:
@@ -161,11 +161,11 @@ class GidTaskConsole(RichConsole):
         title = title or ""
         style = style or "rule.line"
         align = align or "center"
-        characters = characters or self.default_rule_char
+        characters = characters or self.default_rule_settings.characters
         return super().rule(title=title, characters=characters, style=style, align=align)
 
     def big_rule(self, title: "TextType" = None, *, characters: str = None, style: Union[str, Style] = None, align: "AlignMethod" = None) -> None:
-        characters = characters or self.default_rule_char
+        characters = characters or self.default_rule_settings.characters
         style = style or "rule.line"
         align = align or "center"
         title = title or ""
@@ -187,7 +187,7 @@ def make_console():
 
 # region[Main_Exec]
 if __name__ == '__main__':
-    c = GidTaskConsole()
+    c = make_console()
     c.big_rule("[red]tt")
 
 # endregion[Main_Exec]

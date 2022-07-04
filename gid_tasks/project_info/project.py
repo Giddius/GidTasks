@@ -22,10 +22,10 @@ from gid_tasks.project_info.toml import PyProjectTomlFile
 from gid_tasks.version_handling.finder import VersionFinder
 from gidapptools.general_helper.path_helper import change_cwd
 from gid_tasks.project_info.main_module_item import MainModule
-
+from gid_tasks.project_info.vscode_objects import VSCodeFolder
 # * Type-Checking Imports --------------------------------------------------------------------------------->
 if TYPE_CHECKING:
-    from gidapptools.types import PATH_TYPE
+    from gidapptools.custom_types import PATH_TYPE
     from gid_tasks.version_handling.version_item import Version
 
 # endregion[Imports]
@@ -124,6 +124,13 @@ class ProjectPaths:
                 scripts[file.stem.casefold()] = file
         return scripts
 
+    def to_dict(self) -> dict[str, Any]:
+        _out = {}
+        for attr_name in ["base_folder", "venv", "vscode", "tools", "docs", "misc", "temp", "dist", "_scripts"]:
+            _out[attr_name.removeprefix("_")] = getattr(self, attr_name)
+
+        return _out
+
 
 class Project:
     extra_folder: dict[str, Path] = {}
@@ -132,7 +139,8 @@ class Project:
     def __init__(self,
                  pip_manager: PipManager = None,
                  cwd: "PATH_TYPE" = None,
-                 project_paths_class: type[ProjectPaths] = ProjectPaths) -> None:
+                 project_paths_class: type[ProjectPaths] = None,
+                 create_missing_vscode_files:bool=False) -> None:
 
         self.cwd = Path.cwd() if cwd is None else Path(cwd)
         self.base_folder = Path(default_basefolder_finder(self.cwd))
@@ -143,8 +151,9 @@ class Project:
         self.pip_manager = self._determine_pip_manager() if pip_manager is None else pip_manager
 
         self.version = VersionFinder(self.pip_manager, self.main_module).find_version()
-        self._project_paths_class = project_paths_class
+        self._project_paths_class = project_paths_class or ProjectPaths
         self.paths = self._project_paths_class(self.base_folder)
+        self.vscode_folder = VSCodeFolder.from_base_folder(self.base_folder,create_missing_files=create_missing_vscode_files)
 
     @cached_property
     def general_project_data(self) -> dict[str, Any]:
@@ -223,6 +232,18 @@ class Project:
         self.version.write_version()
         return self
 
+    def dump_info(self) -> dict[str, Any]:
+        _out = {}
+
+        _out["name"] = self.pyproject.package_name
+        _out["base_folder"] = self.base_folder
+        _out["main_module"] = self.main_module
+        _out["version"] = self.version
+        _out["pip_manager"] = self.pip_manager
+        _out["general_project_data"] = self.general_project_data
+        _out["paths"] = self.paths.to_dict()
+        return _out
+
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(pip_manager={self.pip_manager!r}, cwd={self.cwd!r}, project_paths_class={self._project_paths_class!r})'
 
@@ -232,7 +253,7 @@ class Project:
 if __name__ == '__main__':
     x = Project()
 
-    print(x.version)
+    print(x.vscode_folder)
 
 
 # endregion[Main_Exec]

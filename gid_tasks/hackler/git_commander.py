@@ -10,7 +10,7 @@ Soon.
 import subprocess
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 import os
 from pprint import pprint
 # endregion[Imports]
@@ -47,9 +47,9 @@ class AbstractCommand(ABC):
     hide: bool = False
     in_stream = None
     out_stream = None
-    inv_shell: str = None
+    inv_shell: Optional[str] = None
 
-    timeout: int = None
+    timeout: Optional[int] = None
 
     @property
     @abstractmethod

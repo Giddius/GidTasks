@@ -7,51 +7,56 @@ name = "gid_tasks"
 authors = [{ name = "BrocaProgs" }]
 classifiers = ["License :: OSI Approved :: MIT License"]
 license = { file = "LICENSE" }
-readme = "README.md"
+readme = "README.rst"
 dynamic = ['version', 'description']
 requires-python = ">=3.9"
 dependencies = [
-    "argh==0.26.2",
-    "attrs==21.4.0",
-    "autoflake==1.4",
-    "autopep8==1.6.0",
-    "commonmark==0.9.1",
-    "invoke==1.6.0",
-    "isort==5.10.1",
-    "marshmallow==3.14.1",
-    "pathtools==0.1.2",
-    "pycodestyle==2.8.0",
-    "pyflakes==2.4.0",
-    "pygments==2.11.2",
-    "pyyaml==6.0",
-    "rich==12.0.0",
-    "sortedcontainers==2.4.0",
-    "toml==0.10.2",
-    "watchdog==0.9.0",
-    "gidapptools>=0.2.1",
-    "yarl~=1.7.2"
+  "argh==0.26.2",
+  "pyparsing",
+  "attrs==21.4.0",
+  "autoflake==1.4",
+  "autopep8==1.6.0",
+  "commonmark==0.9.1",
+  "invoke==1.6.0",
+  "isort==5.10.1",
+  "marshmallow==3.14.1",
+  "pathtools==0.1.2",
+  "pycodestyle==2.8.0",
+  "pyflakes==2.4.0",
+  "pygments==2.11.2",
+  "pyyaml==6.0",
+  "rich==12.0.0",
+  "sortedcontainers==2.4.0",
+  "toml==0.10.2",
+  "watchdog==0.9.0",
+  "gidapptools>=0.2.1",
+  "yarl~=1.7.2",
+  "frozendict",
+  "Send2Trash==1.8.0",
+  "psutil",
 ]
 
 [project.urls]
 Source = "https://github.com/Giddius/GidTasks"
 
 [project.scripts]
+gidtasks = "gid_tasks.__main__:gidtasks_cli"
 
 [project.optional-dependencies]
 
 [tool.flit.sdist]
 exclude = [
-    "misc",
-    "temp",
-    "docs",
-    "tools",
-    ".pydeps",
-    "tests",
-    ".gitattributes",
-    ".gitignore",
-    ".editorconfig",
-    "planning.todo",
-    "tasks.py",
+  "misc",
+  "temp",
+  "docs",
+  "tools",
+  ".pydeps",
+  "tests",
+  ".gitattributes",
+  ".gitignore",
+  ".editorconfig",
+  "planning.todo",
+  "tasks.py",
 ]
 
 [tool.autoflake]
@@ -77,11 +82,11 @@ import_heading_qt = "* Qt Imports ----------------------------------------------
 import_heading_stdlib = "* Standard Library Imports ---------------------------------------------------------------------------->"
 import_heading_thirdparty = "* Third Party Imports --------------------------------------------------------------------------------->"
 known_gid = [
-    "gidtools",
-    "gidlogger",
-    "gidqtutils",
-    "gidviewmodels",
-    "gidapptools"
+  "gidtools",
+  "gidlogger",
+  "gidqtutils",
+  "gidviewmodels",
+  "gidapptools",
 ]
 known_qt = ["PyQt5", "PyQt6", "PySide6", "pyqtgraph"]
 known_typing = ["typing"]
@@ -89,14 +94,14 @@ length_sort = true
 line_length = 200
 lines_after_imports = 1
 sections = [
-    "FUTURE",
-    "TYPING",
-    "STDLIB",
-    "THIRDPARTY",
-    "QT",
-    "GID",
-    "FIRSTPARTY",
-    "LOCALFOLDER",
+  "FUTURE",
+  "TYPING",
+  "STDLIB",
+  "THIRDPARTY",
+  "QT",
+  "GID",
+  "FIRSTPARTY",
+  "LOCALFOLDER",
 ]
 indented_import_headings = false
 force_to_top = ["typing"]

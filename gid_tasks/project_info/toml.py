@@ -52,36 +52,6 @@ def convert_keypath(in_key_path: Union[str, Iterable[str]]) -> list[str]:
     return list(in_key_path)
 
 
-# _observer = Observer()
-
-
-# _all_toml_instances: WeakSet["GidTomlFile"] = WeakSet()
-
-
-# class TomlChangeHandler(FileSystemEventHandler):
-
-#     def dispatch(self, event):
-#         if event.event_type == EVENT_TYPE_MODIFIED:
-#             for instance in _all_toml_instances:
-#                 try:
-#                     instance.on_modified(event=event)
-#                 except AttributeError:
-#                     continue
-
-
-# _event_handler = TomlChangeHandler()
-
-# _observer.start()
-
-
-# def _close_observer():
-#     _observer.stop()
-#     _observer.join()
-
-
-# atexit.register(_close_observer)
-
-
 class GidTomlFile:
     _write_locks: dict[Path, Lock] = {}
 

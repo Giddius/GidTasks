@@ -242,6 +242,6 @@ def clean_imports_task(c):
 
 
 if __name__ == '__main__':
-    p = Project(cwd=Path(r"D:\Dropbox\hobby\Modding\Programs\Github\My_Repos\Antistasi_Logbook\antistasi_logbook"))
+    p = Project(cwd=Path(r"D:\Dropbox\hobby\Modding\Programs\Github\My_Repos\Antistasi_SQF_tools\antistasi_sqf_tools"))
     list(import_clean_project(p))
 # endregion[Main_Exec]

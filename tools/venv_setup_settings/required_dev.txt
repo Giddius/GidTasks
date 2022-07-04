@@ -1,8 +1,11 @@
 autoflake==1.4
+pip-tools==6.5.1
+pp-ez==0.2.0
+pyinstaller @ https://github.com/pyinstaller/pyinstaller/tarball/develop
 autopep8
-cairosvg
+CairoSVG
+code2flow
 dateparser
-https://github.com/pyinstaller/pyinstaller/tarball/develop
 invoke
 isort
 line_profiler
@@ -11,16 +14,13 @@ matplotlib
 memory-profiler
 mypy
 objectgraph
-peewee-erd==0.1.3
 pep517
 pipdeptree
 pipreqs
-pp-ez==0.2.0
 pprintpp
 pydeps
 pylint
-pympler
+Pympler
 tabulate
+tinyaes
 tomlkit
-pip-tools==6.5.1
-pipreqs
