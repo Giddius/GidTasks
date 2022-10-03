@@ -179,16 +179,7 @@ ECHO.
 ECHO.
 ECHO.
 
-Echo +++++++++++++++++++++++++++++ GUI Packages +++++++++++++++++++++++++++++
-ECHO.
 
-ECHO.
-CALL pip install --upgrade --no-cache-dir -r .\venv_setup_settings\required_gui.txt
-ECHO.
-
-
-ECHO.
-ECHO.
 
 Echo +++++++++++++++++++++++++++++ Packages From Github +++++++++++++++++++++++++++++
 ECHO.
@@ -247,7 +238,7 @@ CALL %%A
 ECHO.
 )
 
-call pip list | installed_packages_to_json.py
+call pip list --format json | installed_packages_to_json.py
 
 ECHO.
 ECHO.

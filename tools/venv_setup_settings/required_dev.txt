@@ -1,0 +1,26 @@
+autoflake==1.4
+pip-tools==6.5.1
+pp-ez==0.2.0
+pyinstaller @ https://github.com/pyinstaller/pyinstaller/tarball/develop
+autopep8
+CairoSVG
+code2flow
+dateparser
+invoke
+isort
+line_profiler
+lxml
+matplotlib
+memory-profiler
+mypy
+objectgraph
+pep517
+pipdeptree
+pipreqs
+pprintpp
+pydeps
+pylint
+Pympler
+tabulate
+tinyaes
+tomlkit

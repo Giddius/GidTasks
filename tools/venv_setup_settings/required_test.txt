@@ -1,0 +1,3 @@
+pytest
+pytest-html
+pyparsing==3.0.6

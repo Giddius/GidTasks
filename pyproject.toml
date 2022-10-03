@@ -7,15 +7,31 @@ name = "gid_tasks"
 authors = [{ name = "BrocaProgs" }]
 classifiers = ["License :: OSI Approved :: MIT License"]
 license = { file = "LICENSE" }
-readme = "README.md"
+readme = "README.rst"
 dynamic = ['version', 'description']
 requires-python = ">=3.9"
-dependencies = ["invoke==1.6.0"]
+dependencies = [
+    "pyparsing~=3.0",
+    "attrs~=22.1",
+    "autoflake~=1.6",
+    "autopep8~=1.7",
+    "invoke~=1.7",
+    "isort~=5.10",
+    "marshmallow~=3.18",
+    "rich~=12.6",
+    "sortedcontainers~=2.4",
+    "toml~=0.10",
+    "watchdog~=2.1",
+    "yarl~=1.8",
+    "frozendict~=2.3",
+    "Send2Trash~=1.8",
+]
 
 [project.urls]
 Source = "https://github.com/Giddius/GidTasks"
 
 [project.scripts]
+gidtasks = "gid_tasks.__main__:gidtasks_cli"
 
 [project.optional-dependencies]
 
@@ -34,33 +50,52 @@ exclude = [
     "tasks.py",
 ]
 
+[tool.autoflake]
+# additional_imports=None
+expand_star_imports = true
+remove_all_unused_imports = true
+remove_duplicate_keys = false
+remove_unused_variables = false
+ignore_init_module_imports = false
+
 [tool.autopep8]
-ignore = ["E402", "E501"]
-max-line-length = 250
+ignore = ["E402", "E501", "E731"]
+max_line_length = 250
 
 [tool.isort]
 balanced_wrapping = true
 ensure_newline_before_comments = true
 group_by_package = true
+import_heading_typing = "* Typing Imports --------------------------------------------------------------------------------------->"
 import_heading_firstparty = "* Local Imports --------------------------------------------------------------------------------------->"
 import_heading_gid = "* Gid Imports ----------------------------------------------------------------------------------------->"
-import_heading_pyqt = "* PyQt5 Imports --------------------------------------------------------------------------------------->"
+import_heading_qt = "* Qt Imports --------------------------------------------------------------------------------------->"
 import_heading_stdlib = "* Standard Library Imports ---------------------------------------------------------------------------->"
 import_heading_thirdparty = "* Third Party Imports --------------------------------------------------------------------------------->"
-known_gid = ["gidtools", "gidlogger", "gidqtutils", "gidviewmodels"]
-known_pyqt = ["PyQt5"]
+known_gid = [
+    "gidtools",
+    "gidlogger",
+    "gidqtutils",
+    "gidviewmodels",
+    "gidapptools",
+]
+known_qt = ["PyQt5", "PyQt6", "PySide6", "pyqtgraph"]
+known_typing = ["typing"]
 length_sort = true
 line_length = 200
 lines_after_imports = 1
 sections = [
     "FUTURE",
+    "TYPING",
     "STDLIB",
     "THIRDPARTY",
-    "PYQT",
+    "QT",
     "GID",
     "FIRSTPARTY",
     "LOCALFOLDER",
 ]
+indented_import_headings = false
+force_to_top = ["typing"]
 
 [tool.pytest.ini_options]
-addopts = "-rP -vv --durations=0 --show-capture=all --color=auto --code-highlight=yes"
+addopts = "-rA -vv --durations=0 --capture=tee-sys --show-capture=all --color=auto --code-highlight=yes"
