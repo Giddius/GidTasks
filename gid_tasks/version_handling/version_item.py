@@ -13,9 +13,9 @@ from typing import Any, Union, Optional, TypedDict
 import os
 from pathlib import Path
 from functools import total_ordering
-from frozendict import frozendict
+
 # * Third Party Imports --------------------------------------------------------------------------------->
-import attr
+from frozendict import frozendict
 
 # * Gid Imports ----------------------------------------------------------------------------------------->
 from gid_tasks.utility.enums import PipManager

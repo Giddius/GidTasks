@@ -7,8 +7,8 @@ Soon.
 # region [Imports]
 
 # * Typing Imports --------------------------------------------------------------------------------------->
-from typing import TYPE_CHECKING, Any, Mapping, Optional, Iterable
-from invoke import task
+from typing import TYPE_CHECKING, Any, Mapping, Optional, Callable
+
 # * Standard Library Imports ---------------------------------------------------------------------------->
 import re
 from pathlib import Path
@@ -18,11 +18,12 @@ import attr
 import isort
 import autopep8
 import autoflake
+from invoke import task
 
 # * Gid Imports ----------------------------------------------------------------------------------------->
-from gidapptools import get_logger
+
 from gid_tasks.project_info.project import Project
-from gidapptools.general_helper.hashing import file_hash
+from gid_tasks.utility.misc import file_hash
 
 # * Type-Checking Imports --------------------------------------------------------------------------------->
 if TYPE_CHECKING:
@@ -43,7 +44,7 @@ if TYPE_CHECKING:
 # region [Constants]
 
 THIS_FILE_DIR = Path(__file__).parent.absolute()
-log = get_logger(__name__)
+
 # endregion[Constants]
 
 # autoflake settings defaults
@@ -128,7 +129,8 @@ class ImportsCleaner:
                  settings: Mapping[str, Any],
                  autoflake_settings: Mapping[str, Any],
                  isort_settings: Mapping[str, Any],
-                 autopep8_settings: Mapping[str, Any]) -> None:
+                 autopep8_settings: Mapping[str, Any],
+                 log_func: Callable[[Any], None] = None) -> None:
         self.settings = settings
         self.autoflake_settings = autoflake_settings
         self.isort_settings = isort_settings
@@ -136,6 +138,7 @@ class ImportsCleaner:
 
         self.import_region_name = self._get_setting_value("import_region_name")
         self.import_region_regex = re.compile(self.import_region_regex_pattern[0].format(import_region_name=self.import_region_name), self.import_region_regex_pattern[1])
+        self.log_func = log_func or print
 
     @classmethod
     def from_pyproject_toml(cls, pyproject_toml: "PyProjectTomlFile") -> "ImportsCleaner":
@@ -228,7 +231,7 @@ class ImportsCleaner:
 def import_clean_project(project: "Project"):
     import_cleaner = ImportsCleaner.from_pyproject_toml(project.pyproject)
     for file in project.main_module.get_all_python_files(exclude_init=import_cleaner.exclude_init_files, extra_excludes=import_cleaner.exclude_globs):
-        print(file)
+        import_cleaner.log_func(file)
         _file = import_cleaner.clean_file(file=file)
         if _file is not None:
             yield _file

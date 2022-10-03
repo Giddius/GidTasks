@@ -5,7 +5,7 @@ import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import pytest
-from gidapptools.general_helper.path_helper import change_cwd
+from gid_tasks.utility.misc import change_cwd
 from gid_tasks.project_info.project import Project
 import zipfile
 

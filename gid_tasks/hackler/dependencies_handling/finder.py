@@ -6,58 +6,27 @@ Soon.
 
 # region [Imports]
 
+# * Typing Imports --------------------------------------------------------------------------------------->
+from typing import Any, Optional
+
+# * Standard Library Imports ---------------------------------------------------------------------------->
 import os
-import re
+import ast
 import sys
 import json
-import queue
-import math
-import base64
-import pickle
-import random
-import shelve
-import dataclasses
-import shutil
-import asyncio
-import logging
-import sqlite3
-import platform
-import importlib
-import subprocess
-import inspect
-import pp
-
-import ast
-from time import sleep, process_time, process_time_ns, perf_counter, perf_counter_ns
-from io import BytesIO, StringIO
-from abc import ABC, ABCMeta, abstractmethod
-from copy import copy, deepcopy
-from enum import Enum, Flag, auto, unique
-from time import time, sleep
-from pprint import pprint, pformat
+from pprint import pprint
 from pathlib import Path
-from string import Formatter, digits, printable, whitespace, punctuation, ascii_letters, ascii_lowercase, ascii_uppercase
-from timeit import Timer
-from typing import TYPE_CHECKING, Union, Callable, Iterable, Optional, Mapping, Any, IO, TextIO, BinaryIO, Hashable, Generator, Literal, TypeVar, TypedDict, AnyStr
-from zipfile import ZipFile, ZIP_LZMA
-from datetime import datetime, timezone, timedelta
-from tempfile import TemporaryDirectory
-from textwrap import TextWrapper, fill, wrap, dedent, indent, shorten
-from functools import wraps, partial, lru_cache, singledispatch, total_ordering, cached_property
-from importlib import import_module, invalidate_caches, metadata
-from contextlib import contextmanager, asynccontextmanager, nullcontext, closing, ExitStack, suppress
-from statistics import mean, mode, stdev, median, variance, pvariance, harmonic_mean, median_grouped
-from collections import Counter, ChainMap, deque, namedtuple, defaultdict, UserList
-from urllib.parse import urlparse
-from importlib.util import find_spec, module_from_spec, spec_from_file_location
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
-from importlib.machinery import SourceFileLoader
+from functools import cached_property
+from importlib import metadata
+from collections import UserList
 
+# * Third Party Imports --------------------------------------------------------------------------------->
 import attr
-
-from gid_tasks.project_info.project import Project
-from gidapptools.gid_utility.version_item import VersionItem
 from yarl import URL
+
+# * Gid Imports ----------------------------------------------------------------------------------------->
+from gid_tasks.project_info.project import Project
+from gid_tasks.version_handling.version_item import Version
 
 # endregion[Imports]
 
@@ -82,7 +51,7 @@ THIS_FILE_DIR = Path(__file__).parent.absolute()
 class Dependency:
     import_name: str = attr.ib()
     distribution_name: str = attr.ib()
-    version: VersionItem = attr.ib()
+    version: Version = attr.ib()
     url: URL = attr.ib(default=None)
     files: set[Path] = attr.ib(factory=set, converter=set)
 
@@ -173,7 +142,7 @@ class AstImportVisitor(ast.NodeVisitor):
             import_name = name if "." not in name else name.split(".")[0]
             _distribution = self.distribution_map[import_name]
             distribution_name = _distribution.name
-            version = VersionItem.from_string(_distribution.version)
+            version = Version.from_string(_distribution.version)
             url = _distribution.metadata["Project-URL"] or _distribution.metadata["Home-page"]
             if url is not None:
                 url = URL(url.split()[-1])
@@ -219,7 +188,6 @@ class DependencyFinder:
                 self.found_dependencies.add(dependency)
         for errored in visitor.errored:
             self.errored_names.add(errored)
-        pp(self.errored_names)
 
 
 def find_project_dependencies(project: Project, output_file_path: os.PathLike):
@@ -227,6 +195,8 @@ def find_project_dependencies(project: Project, output_file_path: os.PathLike):
     for file in project.main_module.get_all_python_files():
         finder.search_file(file)
     finder.found_dependencies.to_file(output_file_path)
+    if finder.errored_names:
+        pprint(finder.errored_names)
 
 
 # region[Main_Exec]

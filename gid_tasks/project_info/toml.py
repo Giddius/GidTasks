@@ -23,8 +23,8 @@ from tomlkit.toml_document import TOMLDocument
 
 # * Gid Imports ----------------------------------------------------------------------------------------->
 from gid_tasks.errors import NotUniqueNestedKey, WrongFileTypeError
-from gidapptools.general_helper.enums import MiscEnum
-from gidapptools.general_helper.hashing import file_hash
+
+from gid_tasks.utility.misc import file_hash
 
 # endregion[Imports]
 
@@ -43,6 +43,9 @@ from gidapptools.general_helper.hashing import file_hash
 THIS_FILE_DIR = Path(__file__).parent.absolute()
 PATH_TYPE = Union[str, os.PathLike, Path]
 # endregion[Constants]
+
+
+NOTHING = object()
 
 
 def convert_keypath(in_key_path: Union[str, Iterable[str]]) -> list[str]:
@@ -117,7 +120,7 @@ class GidTomlFile:
         self._check_changed()
         return self.document.get(key, default)
 
-    def get_from_key_path(self, key_path: Union[str, Iterable[str]], default=MiscEnum.NOTHING) -> Any:
+    def get_from_key_path(self, key_path: Union[str, Iterable[str]], default=NOTHING) -> Any:
         self._check_changed()
         key_path = convert_keypath(key_path).copy()
         last_key = key_path.pop(-1)
@@ -126,13 +129,13 @@ class GidTomlFile:
             try:
                 data = data[key]
             except KeyError as e:
-                if default is MiscEnum.NOTHING:
+                if default is NOTHING:
                     raise KeyError(f"The {key_path.index(key)+1}. key {key!r} was not found in the dict.") from e
                 return default
         try:
             return data[last_key]
         except KeyError:
-            if default is MiscEnum.NOTHING:
+            if default is NOTHING:
                 raise
             return default
 
@@ -203,12 +206,12 @@ class PyProjectTomlFile(GidTomlFile):
         if raw_authors is not None:
             return frozenset(str(author.get("name")) for author in raw_authors)
 
-    def get_autoflake_settings(self, default=MiscEnum.NOTHING) -> dict[str, Any]:
-        default = {} if default is MiscEnum.NOTHING else default
+    def get_autoflake_settings(self, default=NOTHING) -> dict[str, Any]:
+        default = {} if default is NOTHING else default
         return self.get_from_key_path(["tool", "autoflake"], default=default)
 
-    def get_autopep8_settings(self, default=MiscEnum.NOTHING) -> dict[str, Any]:
-        default = {} if default is MiscEnum.NOTHING else default
+    def get_autopep8_settings(self, default=NOTHING) -> dict[str, Any]:
+        default = {} if default is NOTHING else default
         return self.get_from_key_path(["tool", "autopep8"], default=default)
 
     def _complete_isort_settings(self, settings: dict[str, Any]) -> dict[str, Any]:
@@ -217,13 +220,13 @@ class PyProjectTomlFile(GidTomlFile):
         settings["known_gid"] = list(set(settings.get("known_gid", []) + ["gid*"]))
         return settings
 
-    def get_isort_settings(self, default=MiscEnum.NOTHING) -> dict[str, Any]:
-        default = {} if default is MiscEnum.NOTHING else default
+    def get_isort_settings(self, default=NOTHING) -> dict[str, Any]:
+        default = {} if default is NOTHING else default
         settings = self.get_from_key_path(["tool", "isort"], default=default)
         return self._complete_isort_settings(settings=settings)
 
-    def get_gid_task_settings(self, default=MiscEnum.NOTHING) -> dict[str, Any]:
-        default = {} if default is MiscEnum.NOTHING else default
+    def get_gid_task_settings(self, default=NOTHING) -> dict[str, Any]:
+        default = {} if default is NOTHING else default
         return self.get_from_key_path(["tool", "gid_tasks"], default=default)
 
     def get_project_data(self) -> dict[str, Any]:

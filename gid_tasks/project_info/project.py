@@ -7,25 +7,29 @@ Soon.
 # region [Imports]
 
 # * Typing Imports --------------------------------------------------------------------------------------->
-from typing import TYPE_CHECKING, Union, Callable, Optional, Any, Iterable
+from typing import TYPE_CHECKING, Any, Union, Callable, Iterable, Optional, TypeAlias
 
 # * Standard Library Imports ---------------------------------------------------------------------------->
+import re
+import sys
 import json
+import subprocess
 from pathlib import Path
 from functools import cached_property
-import re
+import os
+
 # * Gid Imports ----------------------------------------------------------------------------------------->
-from gid_tasks.errors import IsFolderError, AmbigousBaseFolderError
-from gid_tasks.utility.misc import main_dir_from_git, find_main_dir_by_pyproject_location
+from gid_tasks.errors import IsFolderError
+from gid_tasks.utility.misc import find_main_dir_by_pyproject_location
 from gid_tasks.utility.enums import PipManager
 from gid_tasks.project_info.toml import PyProjectTomlFile
 from gid_tasks.version_handling.finder import VersionFinder
-from gidapptools.general_helper.path_helper import change_cwd
-from gid_tasks.project_info.main_module_item import MainModule
 from gid_tasks.project_info.vscode_objects import VSCodeFolder
+from gid_tasks.utility.misc import change_cwd
+from gid_tasks.project_info.main_module_item import MainModule
+
 # * Type-Checking Imports --------------------------------------------------------------------------------->
 if TYPE_CHECKING:
-    from gidapptools.custom_types import PATH_TYPE
     from gid_tasks.version_handling.version_item import Version
 
 # endregion[Imports]
@@ -45,6 +49,8 @@ if TYPE_CHECKING:
 THIS_FILE_DIR = Path(__file__).parent.absolute()
 
 # endregion[Constants]
+
+PATH_TYPE: TypeAlias = Union[str, os.PathLike[str], Path]
 
 DEFAULT_EMPTY_JSON_TYPUS: Union[type[dict], type[list]] = list
 
@@ -132,6 +138,19 @@ class ProjectPaths:
         return _out
 
 
+def get_pip_inspect_data() -> dict[str, object]:
+    path_to_pip = Path(sys.prefix, "Scripts", "pip.exe")
+
+    cmd = [path_to_pip, "inspect"]
+    #cmd = [path_to_pip, "list", "--format", "json"]
+    process = subprocess.run(cmd, check=False, text=True, capture_output=True)
+    if process.returncode != 0 and 'unknown command "inspect"' in process.stderr:
+        raise RuntimeError("Pip update required!")
+    raw_text = process.stdout.split("[notice]", 1)[0]
+
+    return json.loads(raw_text)
+
+
 class Project:
     extra_folder: dict[str, Path] = {}
     extra_files: dict[str, Path] = {}
@@ -140,7 +159,7 @@ class Project:
                  pip_manager: PipManager = None,
                  cwd: "PATH_TYPE" = None,
                  project_paths_class: type[ProjectPaths] = None,
-                 create_missing_vscode_files:bool=False) -> None:
+                 create_missing_vscode_files: bool = False) -> None:
 
         self.cwd = Path.cwd() if cwd is None else Path(cwd)
         self.base_folder = Path(default_basefolder_finder(self.cwd))
@@ -153,7 +172,11 @@ class Project:
         self.version = VersionFinder(self.pip_manager, self.main_module).find_version()
         self._project_paths_class = project_paths_class or ProjectPaths
         self.paths = self._project_paths_class(self.base_folder)
-        self.vscode_folder = VSCodeFolder.from_base_folder(self.base_folder,create_missing_files=create_missing_vscode_files)
+        self.vscode_folder = VSCodeFolder.from_base_folder(self.base_folder, create_missing_files=create_missing_vscode_files)
+
+    @property
+    def pip_inspect_data(self) -> dict[str, object]:
+        return get_pip_inspect_data()
 
     @cached_property
     def general_project_data(self) -> dict[str, Any]:
@@ -251,9 +274,7 @@ class Project:
 
 
 if __name__ == '__main__':
-    x = Project()
-
-    print(x.vscode_folder)
+    pass
 
 
 # endregion[Main_Exec]

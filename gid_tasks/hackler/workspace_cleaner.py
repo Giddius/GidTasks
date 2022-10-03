@@ -6,58 +6,25 @@ Soon.
 
 # region [Imports]
 
-import os
-import re
-import sys
-import json
-import queue
-import math
-import base64
-import pickle
-import random
-import shelve
-import dataclasses
-import shutil
-import asyncio
-import logging
-import sqlite3
-import platform
-import importlib
-import subprocess
-import inspect
+# * Typing Imports --------------------------------------------------------------------------------------->
+from typing import TYPE_CHECKING, Any, Mapping, Callable
 
-from time import sleep, process_time, process_time_ns, perf_counter, perf_counter_ns
-from io import BytesIO, StringIO
-from abc import ABC, ABCMeta, abstractmethod
-from copy import copy, deepcopy
-from enum import Enum, Flag, auto, unique
-from time import time, sleep
-from pprint import pprint, pformat
-from pathlib import Path
-from string import Formatter, digits, printable, whitespace, punctuation, ascii_letters, ascii_lowercase, ascii_uppercase
-from timeit import Timer
-from typing import TYPE_CHECKING, Union, Callable, Iterable, Optional, Mapping, Any, IO, TextIO, BinaryIO, Hashable, Generator, Literal, TypeVar, TypedDict, AnyStr
-from zipfile import ZipFile, ZIP_LZMA
-from datetime import datetime, timezone, timedelta
-from tempfile import TemporaryDirectory
-from textwrap import TextWrapper, fill, wrap, dedent, indent, shorten
-from functools import wraps, partial, lru_cache, singledispatch, total_ordering, cached_property
-from importlib import import_module, invalidate_caches
-from contextlib import contextmanager, asynccontextmanager, nullcontext, closing, ExitStack, suppress
-from statistics import mean, mode, stdev, median, variance, pvariance, harmonic_mean, median_grouped
-from collections import Counter, ChainMap, deque, namedtuple, defaultdict
-from urllib.parse import urlparse
-from importlib.util import find_spec, module_from_spec, spec_from_file_location
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
-from importlib.machinery import SourceFileLoader
-import pp
+# * Standard Library Imports ---------------------------------------------------------------------------->
+import os
+import shutil
 import logging
-from gidapptools import get_logger
-import gid_tasks
+from pathlib import Path
+
+# * Third Party Imports --------------------------------------------------------------------------------->
 from send2trash import send2trash
 
+# * Gid Imports ----------------------------------------------------------------------------------------->
+
+
+# * Type-Checking Imports --------------------------------------------------------------------------------->
 if TYPE_CHECKING:
     from gid_tasks.project_info.project import Project
+
 # endregion[Imports]
 
 # region [TODO]
@@ -72,12 +39,9 @@ if TYPE_CHECKING:
 
 # region [Constants]
 
-h = logging.StreamHandler()
 
 THIS_FILE_DIR = Path(__file__).parent.absolute()
-log = get_logger(__name__)
-log.addHandler(h)
-log.setLevel(logging.DEBUG)
+
 # endregion[Constants]
 
 
@@ -87,9 +51,10 @@ class WorkspaceCleaner:
                                         "to_clean": [],
                                         "dry_run": True}
 
-    def __init__(self, base_folder: os.PathLike, settings: Mapping[str, Any] = None) -> None:
+    def __init__(self, base_folder: os.PathLike, settings: Mapping[str, Any] = None, log_func: Callable[[Any], None] = None) -> None:
         self.base_folder = Path(base_folder).resolve()
         self.settings = settings or {}
+        self.log_func = log_func or print
 
     def get_folders_to_ignore_setting(self) -> set[str]:
         from_settings = self.settings.get("folder_to_ignore", [])
@@ -120,7 +85,7 @@ class WorkspaceCleaner:
 
     def _clean_file(self, in_file: Path) -> None:
         if self.get_dry_run_setting() is True:
-            log.debug("not deleting file %r because dry_run=True", in_file.as_posix())
+            self.log_func("not deleting file %r because dry_run=True", in_file.as_posix())
         else:
             if in_file.exists() is False:
                 return
@@ -128,11 +93,11 @@ class WorkspaceCleaner:
                 send2trash(in_file)
             except OSError:
                 in_file.unlink(missing_ok=True)
-            log.info("cleaned file %r", in_file.as_posix())
+            self.log_func("cleaned file %r", in_file.as_posix())
 
     def _clean_folder(self, in_folder: Path) -> Path:
         if self.get_dry_run_setting() is True:
-            log.debug("not deleting folder %r because dry_run=True", in_folder.as_posix())
+            self.log_func("not deleting folder %r because dry_run=True", in_folder.as_posix())
         else:
             if in_folder.exists() is False:
                 return
@@ -141,7 +106,7 @@ class WorkspaceCleaner:
             except OSError:
                 shutil.rmtree(in_folder)
                 in_folder.unlink(True)
-            log.info("cleaned folder %r", in_folder.as_posix())
+            self.log_func("cleaned folder %r", in_folder.as_posix())
 
     def clean(self) -> None:
         for dirname, folderlist, filelist in os.walk(self.base_folder, topdown=True):
@@ -154,7 +119,7 @@ class WorkspaceCleaner:
                 folder_path = Path(dirname, folder)
                 if self._check_if_to_clean(folder_path) is True:
                     self._clean_folder(folder_path)
-        log.info("finished cleaning %r (%r)", self.base_folder.name, self.base_folder.as_posix())
+        self.log_func("finished cleaning %r (%r)", self.base_folder.name, self.base_folder.as_posix())
 
 
 def clean_project(project: "Project") -> None:

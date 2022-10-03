@@ -13,14 +13,21 @@ from rich.box import Box
 from functools import reduce
 from operator import add
 from gid_tasks.hackler.imports_cleaner import import_clean_project
-
+from gid_tasks.hackler.dependencies_handling.finder import find_project_dependencies
 project = set_project()
 CONSOLE = RichConsole(soft_wrap=True)
+
+THIS_FILE_DIR = Path(__file__).parent.absolute()
 
 
 @task
 def clean_imports(c):
-    import_clean_project(c.config.project)
+    list(import_clean_project(project))
 
 
-add_tasks_to_vscode(project, clean_imports)
+@task
+def find_all_dependencies(c):
+    find_project_dependencies(project=project, output_file_path=THIS_FILE_DIR.joinpath("temp", "all_dependencies.json"))
+
+
+add_tasks_to_vscode(project, clean_imports, find_all_dependencies)

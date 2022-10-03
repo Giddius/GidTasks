@@ -3,7 +3,7 @@ GidTasks
 """
 
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 from pathlib import Path
 import logging
 from gid_tasks.project_info import set_project, add_tasks_to_vscode
