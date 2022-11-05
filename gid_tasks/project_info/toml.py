@@ -23,7 +23,6 @@ from tomlkit.toml_document import TOMLDocument
 
 # * Gid Imports ----------------------------------------------------------------------------------------->
 from gid_tasks.errors import NotUniqueNestedKey, WrongFileTypeError
-
 from gid_tasks.utility.misc import file_hash
 
 # endregion[Imports]

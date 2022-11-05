@@ -10,22 +10,21 @@ Soon.
 from typing import TYPE_CHECKING, Any, Union, Callable, Iterable, Optional, TypeAlias
 
 # * Standard Library Imports ---------------------------------------------------------------------------->
+import os
 import re
 import sys
 import json
 import subprocess
 from pathlib import Path
 from functools import cached_property
-import os
 
 # * Gid Imports ----------------------------------------------------------------------------------------->
 from gid_tasks.errors import IsFolderError
-from gid_tasks.utility.misc import find_main_dir_by_pyproject_location
+from gid_tasks.utility.misc import change_cwd, find_main_dir_by_pyproject_location
 from gid_tasks.utility.enums import PipManager
 from gid_tasks.project_info.toml import PyProjectTomlFile
 from gid_tasks.version_handling.finder import VersionFinder
 from gid_tasks.project_info.vscode_objects import VSCodeFolder
-from gid_tasks.utility.misc import change_cwd
 from gid_tasks.project_info.main_module_item import MainModule
 
 # * Type-Checking Imports --------------------------------------------------------------------------------->

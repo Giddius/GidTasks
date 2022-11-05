@@ -12,14 +12,10 @@ from typing import TYPE_CHECKING, Any, Mapping, Callable
 # * Standard Library Imports ---------------------------------------------------------------------------->
 import os
 import shutil
-import logging
 from pathlib import Path
 
 # * Third Party Imports --------------------------------------------------------------------------------->
 from send2trash import send2trash
-
-# * Gid Imports ----------------------------------------------------------------------------------------->
-
 
 # * Type-Checking Imports --------------------------------------------------------------------------------->
 if TYPE_CHECKING:

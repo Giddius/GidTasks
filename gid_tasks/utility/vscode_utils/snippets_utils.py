@@ -14,8 +14,6 @@ import json
 from pathlib import Path
 from collections.abc import Iterable
 
-# * Gid Imports ----------------------------------------------------------------------------------------->
-
 # endregion[Imports]
 
 # region [TODO]

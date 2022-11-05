@@ -7,7 +7,7 @@ Soon.
 # region [Imports]
 
 # * Typing Imports --------------------------------------------------------------------------------------->
-from typing import TYPE_CHECKING, Any, Mapping, Optional, Callable
+from typing import TYPE_CHECKING, Any, Mapping, Callable, Optional
 
 # * Standard Library Imports ---------------------------------------------------------------------------->
 import re
@@ -21,9 +21,8 @@ import autoflake
 from invoke import task
 
 # * Gid Imports ----------------------------------------------------------------------------------------->
-
-from gid_tasks.project_info.project import Project
 from gid_tasks.utility.misc import file_hash
+from gid_tasks.project_info.project import Project
 
 # * Type-Checking Imports --------------------------------------------------------------------------------->
 if TYPE_CHECKING:

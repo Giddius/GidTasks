@@ -13,8 +13,8 @@ requires-python = ">=3.9"
 dependencies = [
     "pyparsing~=3.0",
     "attrs~=22.1",
-    "autoflake~=1.6",
-    "autopep8~=1.7",
+    "autoflake~=1.7",
+    "autopep8~=2.0",
     "invoke~=1.7",
     "isort~=5.10",
     "marshmallow~=3.18",
